@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Text;
 using System.IO;
 using System.CodeDom.Compiler;
@@ -13,7 +14,6 @@ using Markdig.Extensions.Yaml;
 using Markdig.Renderers.Normalize;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-
 namespace Atheneum;
 
 /// <summary>
