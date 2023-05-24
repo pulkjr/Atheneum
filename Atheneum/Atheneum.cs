@@ -120,7 +120,16 @@ public class Atheneum
             {
                 // Instantiate the article
                 yaml = yamlBlock?.Lines.ToString() ?? "";
-                Article _article = yamlDeserializer.Deserialize<Article>(yaml);
+
+                Article _article;
+                try
+                {
+                    _article = yamlDeserializer.Deserialize<Article>(yaml);
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidCastException($"There was an issue during the deserialization of {_file.FullName}. Error was {e.Message} : {e.InnerException.Message}");
+                }
 
                 // Add the Path to the Object
                 _article.Path = _file;
@@ -143,6 +152,10 @@ public class Atheneum
 
             }
             else if (string.Compare(_normalizedType, "rtm", StringComparison.CurrentCultureIgnoreCase) == 0)
+            {
+
+            }
+            else if (string.Compare(_normalizedType, "install", StringComparison.CurrentCultureIgnoreCase) == 0 || string.Compare(_normalizedType, "reference", StringComparison.CurrentCultureIgnoreCase) == 0)
             {
 
             }

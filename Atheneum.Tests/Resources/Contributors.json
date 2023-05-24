@@ -1,0 +1,33 @@
+[
+    {
+        "DisplayName": "Doe, John",
+        "GivenName": "John",
+        "TrainingRecords": [
+            {
+                "ArticleID": "97f248a2-d5d7-4c66-b7c0-c46fbbf725ef",
+                "ArticleTitle": "Connect to Remote Exchange Server",
+                "TrainingDates": [
+                    "2023-05-20"
+                ]
+            }
+        ],
+        "Surname": "Doe",
+        "SamAccountName": "john.doe",
+        "Role": 4
+    },
+    {
+        "DisplayName": "Doe, Jane",
+        "GivenName": "Jane",
+        "TrainingRecords": [
+            {
+                "ArticleID": "f47d5c1f-3d2b-443f-a9aa-7c2dd39d11b8",
+                "ArticleTitle": "An Article",
+                "TrainingDates": [
+                    "2023-05-23T00:00:00-04:00"
+                ]
+            }
+        ],
+        "Surname": "Doe",
+        "SamAccountName": "jane.doe"
+    }
+]
