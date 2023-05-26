@@ -9,18 +9,19 @@ namespace Atheneum.Tests;
 [TestFixture]
 public class ArticleTests
 {
-    private DirectoryInfo DocumentationPath;
+    private ScribeSettings ScribeSettings;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        DocumentationPath = new DirectoryInfo("./Resources");
+        ScribeSettings = new();
+        ScribeSettings.DocumentationDirectory = new("./Resources");
     }
 
     [Test]
     public void ValidateYamlPropertyValues()
     {
-        Atheneum root = new Atheneum(DocumentationPath);
+        Scribe root = new Scribe(ScribeSettings);
         Assert.Multiple(() =>
         {
             Assert.That(root.Articles.Count(), Is.EqualTo(3));

@@ -42,6 +42,7 @@ public class Contributor
         Surname = user.Surname;
         GivenName = user.GivenName;
         DisplayName = user.DisplayName;
+        TrainingRecords = new();
     }
 
     public Contributor() { }
@@ -56,9 +57,23 @@ public class Contributor
 
         AddTrainingRecord(article, _trainingRecordDate);
     }
+    public void AddTrainingRecord(List<Article> articles)
+    {
+        DateTime _trainingRecordDate = DateTime.Now.Date;
+
+        articles.ForEach(a => AddTrainingRecord(a, _trainingRecordDate));
+    }
+    public void AddTrainingRecord(List<Article> articles, DateTime date)
+    {
+        articles.ForEach(a => AddTrainingRecord(a, date));
+    }
 
     public void AddTrainingRecord(Article article, DateTime date)
     {
+        if(null == TrainingRecords)
+        {
+            TrainingRecords = new();
+        }
         if (!TrainingRecords.Any(tr => tr.ArticleID == article.ID && tr.ArticleTitle == article.Title))
         {
             // No training record exist for this article on this Contributor add a new record.
