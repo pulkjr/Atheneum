@@ -4,24 +4,23 @@ using Atheneum.Enums;
 namespace Atheneum.Tests;
 
 [TestFixture]
-public class AtheneumFunctionalTests
+public class ScribeTests
 {
-    private DirectoryInfo DocumentationPath;
-
-    private FileInfo ContributorsJson;
-
+    private ScribeSettings ScribeSettings;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        DocumentationPath = new DirectoryInfo(".//Resources");
-        ContributorsJson = new FileInfo($".//Resources//Contributors.json");
+        ScribeSettings = new();
+        ScribeSettings.DocumentationDirectory = new("./Resources");
+        ScribeSettings.ContributorsJsonPath = new FileInfo($".//Resources//Contributors.json");
     }
     [Test, Description("Validate that a Contributors can be deserialized correctly"), Order(0)]
     public void ValidateNewContributorFromFile()
     {
-        Atheneum atheneum = new();
-        atheneum.ImportContributors(ContributorsJson);
+        ScribeSettings _testSettings = new();
+        _testSettings.ContributorsJsonPath = ScribeSettings.ContributorsJsonPath;
+        Scribe atheneum = new(_testSettings);
         Assert.Multiple(() =>
         {
             Assert.That(atheneum.Contributors[0].GivenName, Is.EqualTo("John"));
@@ -30,33 +29,16 @@ public class AtheneumFunctionalTests
             Assert.That(atheneum.Contributors[0].Role, Is.EqualTo(Skillset.Integrator));
         });
     }
-
-    [Test, Description("Validate Errors are working")]
-    public void ValidateNewContributorFileType()
-    {
-        Atheneum atheneum = new();
-        Assert.Throws<NotSupportedException>(() => atheneum.ImportContributors((new FileInfo("./Test.yaml"))));
-
-    }
-    [Test, Description("Validate Errors are working")]
-    public void ValidateNewContributorFileExists()
-    {
-        Atheneum atheneum = new();
-        Assert.Throws<FileNotFoundException>(() => atheneum.ImportContributors((new FileInfo("./Test.json"))));
-
-    }
     [Test, Description("Validate Save Team Members is working"), Order(1)]
     public void ValidateExportContributors()
     {
-        Atheneum atheneum = new(DocumentationPath);
-
-        atheneum.ImportContributors(ContributorsJson);
+        Scribe atheneum = new(ScribeSettings);
 
         Contributor john = atheneum.Contributors.Where(tm => tm.SamAccountName == "john.doe").FirstOrDefault();
 
         atheneum.Articles.ForEach(a => john.AddTrainingRecord(a));
 
-        FileInfo _tempContributorsPath = new($"{ContributorsJson.Directory.FullName}/ExportTest.json");
+        FileInfo _tempContributorsPath = new($"{ScribeSettings.ContributorsJsonPath.Directory.FullName}/ExportTest.json");
 
         Console.Write(_tempContributorsPath.FullName);
 
@@ -67,9 +49,7 @@ public class AtheneumFunctionalTests
     [Test, Description("Validate Save Article Changes")]
     public void ValidateSaveArticleUpdates()
     {
-        Atheneum atheneum = new(DocumentationPath);
-
-        atheneum.ImportContributors(ContributorsJson);
+        Scribe atheneum = new(ScribeSettings);
 
         Article article = atheneum.Articles.Where(a => a.ID == "05d54556-bc64-4e7d-a0a1-bafb2bb5a98e").FirstOrDefault();
 

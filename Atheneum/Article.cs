@@ -233,7 +233,7 @@ public class Article
         // Create a HTML Renderer and setup it with the pipeline
         HtmlRenderer renderer = new(writer);
 
-        Atheneum.Pipeline.Setup(renderer);
+        Scribe.Pipeline.Setup(renderer);
 
         // Renders markdown to HTML (to the writer)
         _ = renderer.Render(Markdown);
@@ -265,7 +265,7 @@ public class Article
         // Found this here: https://github.com/xoofx/markdig/issues/155
         using var stringWriter = new StringWriter();
         var renderer = new NormalizeRenderer(stringWriter);
-        Atheneum.Pipeline.Setup(renderer);
+        Scribe.Pipeline.Setup(renderer);
         renderer.Render(Markdown);
         _articleString.AppendLine(stringWriter.ToString());
 
