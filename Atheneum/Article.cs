@@ -14,6 +14,7 @@ using Markdig.Extensions.Yaml;
 using Markdig.Renderers.Normalize;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+
 namespace Atheneum;
 
 /// <summary>
@@ -270,5 +271,21 @@ public class Article
         _articleString.AppendLine(stringWriter.ToString());
 
         File.WriteAllText(Path.FullName, _articleString.ToString());
+    }
+    /// <summary>
+    /// Set the Markdown property
+    /// </summary>
+    /// <param name="content">A string containing the content of the markdown file.</param>
+    /// <exception cref="InvalidDataException">There was a problem converting the markdown content.</exception>
+    public void SetMarkdown(string content)
+    {
+        try
+        {
+            Markdown = Markdig.Markdown.Parse(content, Scribe.Pipeline);
+        }
+        catch (Exception e)
+        {
+            throw new InvalidDataException($"There was a problem converting the markdown content. The error received was {e.GetBaseException().Message}");
+        }
     }
 }
