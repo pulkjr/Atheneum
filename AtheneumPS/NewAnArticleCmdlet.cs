@@ -16,7 +16,7 @@ namespace AtheneumPS;
 /// </summary>
 /// <example>
 ///   <para>Create a new article for a Brocade KB Article</para>
-///   <code>New-AnArticle -Title "Create New FCP Alias" -Type Create -Technology Brocade -Path "c:\scripts\git\storage\site\docs\brocade"</code>
+///   <code>New-AnArticle -Title "Create New FCP Alias" -Type Create -Technology Brocade -Type Create</code>
 /// </example>
 [Cmdlet(VerbsCommon.New, "AnArticle")]
 [Alias("New-PdocArticle")]
@@ -178,7 +178,9 @@ public class NewAnArticleCmdlet : PSCmdlet
 
         if (null == scribeSettings)
         {
-            throw new Exception("The PS Settings are null");
+            ErrorRecord errorRecord = new(new NullReferenceException("The PS Settings are null"), "NullPsSettings", ErrorCategory.ResourceUnavailable, scribeSettings);
+            WriteError(errorRecord);
+            return;
         }
         Article article = new();
         article.Title = Title;

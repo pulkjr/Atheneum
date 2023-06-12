@@ -11,8 +11,8 @@ namespace AtheneumPS;
 /// <para type="synopsis">Display the Global Settings</para>
 /// </summary>
 /// <example>
-///   <para>Create a new article for a Brocade KB Article</para>
-///   <code>New-AnArticle -Title "Create New FCP Alias" -Type Create -Technology Brocade -Path "c:\scripts\git\storage\site\docs\brocade"</code>
+///   <para>Display the current settings for AtheneumPS</para>
+///   <code>Get-AtheneumPsSettings</code>
 /// </example>
 [Cmdlet(VerbsCommon.Get, "AtheneumPsSettings")]
 [Alias("Get-AnModuleSettings")]
@@ -25,13 +25,17 @@ public class GetAtheneumPsSettingsCmdlet : PSCmdlet
 
         if (!settingsPath.Exists)
         {
-            throw new CmdletInvocationException("AtheneumPS settings directory not present. Please run Set-AtheneumPsSettings.");
+            ErrorRecord errorRecord = new(new DirectoryNotFoundException("AtheneumPS settings directory not present. Please run Set-AtheneumPsSettings."), "DirectoryNotFound", ErrorCategory.ReadError, settingsPath);
+            WriteError(errorRecord);
+            return;
         }
         FileInfo settingsJsonPath = new(Path.Combine(settingsPath.FullName, "AtheneumPsSettings.json"));
 
         if (!settingsJsonPath.Exists)
         {
-            throw new CmdletInvocationException("AtheneumPSSettings.json not present. Please run Set-AtheneumPsSettings.");
+            ErrorRecord errorRecord = new(new FileNotFoundException("AtheneumPSSettings.json not present. Please run Set-AtheneumPsSettings."), "JsonFileNotFound", ErrorCategory.ReadError, settingsJsonPath);
+            WriteError(errorRecord);
+            return;
         }
         ScribeSettings _globalSettings = (ScribeSettings)this.SessionState.PSVariable.GetValue("AtheniumSettings") ?? ImportPsSettingsJson(settingsJsonPath);
 
@@ -41,10 +45,6 @@ public class GetAtheneumPsSettingsCmdlet : PSCmdlet
     }
     private ScribeSettings ImportPsSettingsJson(FileInfo jsonPath)
     {
-        if (!jsonPath.Exists)
-        {
-            throw new CmdletInvocationException("AtheneumPSSettings.json not present, nothing to import. Please run Set-AtheneumPsSettings.");
-        }
         string jsonString = File.ReadAllText(jsonPath.FullName);
 
         return JsonSerializer.Deserialize<ScribeSettings>(jsonString);

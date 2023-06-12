@@ -40,6 +40,12 @@ public class SetAtheneumPsSettingsCmdlet : PSCmdlet
 
     protected async override void EndProcessing()
     {
+        if(!DocumentationDirectory.Exists)
+        {
+            ErrorRecord errorRecord = new(new DirectoryNotFoundException("The provided DocumentationDirectory could not be found."),"DirectoryNotFound",ErrorCategory.ReadError, DocumentationDirectory);
+            WriteError(errorRecord);
+            return;
+        }
         DirectoryInfo settingsPath = new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Atheneum"));
 
         FileInfo settingsJsonPath = new(Path.Combine(settingsPath.FullName, "AtheneumPsSettings.json"));
@@ -57,8 +63,16 @@ public class SetAtheneumPsSettingsCmdlet : PSCmdlet
             {
                 settingsPath.Create();
             }
-
-            _globalSettings = new ScribeSettings(settingsJsonPath, DocumentationDirectory, ContributorsJsonPath);
+            try
+            {
+                _globalSettings = new ScribeSettings(settingsJsonPath, DocumentationDirectory, ContributorsJsonPath);
+            }
+            catch (Exception e)
+            {
+                ErrorRecord errorRecord = new(new InvalidDataException($"Could not create new PS Settings: {e.GetBaseException()}"), "UnexpectedError", ErrorCategory.ReadError, DocumentationDirectory);
+                WriteError(errorRecord);
+                return;
+            }
         }
 
         _globalSettings.DocumentationDirectory = DocumentationDirectory;
@@ -73,7 +87,9 @@ public class SetAtheneumPsSettingsCmdlet : PSCmdlet
         }
         catch (Exception e)
         {
-            throw e;
+            ErrorRecord errorRecord = new(new InvalidDataException($"There was an unexpected error while attempting to save the settings to disk: {e.GetBaseException()}"), "UnexpectedError", ErrorCategory.WriteError, _globalSettings);
+            WriteError(errorRecord);
+            return;
         }
 
         SessionState.PSVariable.Set(new PSVariable("AtheniumSettings", _globalSettings, ScopedItemOptions.Private));
