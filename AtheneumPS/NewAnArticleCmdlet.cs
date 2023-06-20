@@ -21,7 +21,7 @@ namespace AtheneumPS;
 [Cmdlet(VerbsCommon.New, "AnArticle")]
 [Alias("New-PdocArticle")]
 [OutputType(typeof(Article))]
-public class NewAnArticleCmdlet : PSCmdlet
+public class NewAnArticleCmdlet : Base
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     /// <summary>
@@ -172,9 +172,7 @@ public class NewAnArticleCmdlet : PSCmdlet
     }
     protected override void ProcessRecord()
     {
-        GetAtheneumPsSettingsCmdlet _getPsSettings = new GetAtheneumPsSettingsCmdlet();
-
-        ScribeSettings scribeSettings = _getPsSettings.Invoke<ScribeSettings>().FirstOrDefault();
+        ScribeSettings scribeSettings = base.GetSettings();
 
         if (null == scribeSettings)
         {
@@ -195,7 +193,7 @@ public class NewAnArticleCmdlet : PSCmdlet
         
         article.Technology = Technology;
 
-        FileInfo templateFileInfo = new(System.IO.Path.Combine(scribeSettings.MarkdownTemplateDirectory.FullName, $"{Type}.md"));
+        FileInfo templateFileInfo = new(System.IO.Path.Combine(scribeSettings.MarkdownTemplateDirectory.FullName, $"{Type}.template.md"));
 
         string markdownString = "<!-- TODO:LOW:  [Backlog] - Add Content -->";
 
@@ -275,6 +273,7 @@ public class NewAnArticleCmdlet : PSCmdlet
         {
             article.LastTrained = LastTrained;
         }
+        article.Save();
         WriteObject(article);
     }
 
@@ -292,7 +291,7 @@ public class NewAnArticleCmdlet : PSCmdlet
                 name = $"{Type}.{Order} - {Title}.md";
             }
         }
-        else if (string.IsNullOrEmpty(Section))
+        else if (!string.IsNullOrEmpty(Section))
         {
             name = $"{Type}.{Section} - {Title}.md";
         }

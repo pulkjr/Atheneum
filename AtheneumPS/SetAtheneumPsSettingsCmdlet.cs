@@ -1,10 +1,10 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using System.IO;
 using System.Management.Automation;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Atheneum;
-
 namespace AtheneumPS;
 
 /// <summary>
@@ -17,26 +17,41 @@ namespace AtheneumPS;
 [Cmdlet(VerbsCommon.Set, "AtheneumPsSettings")]
 [Alias("Set-AnModuleSettings")]
 [OutputType(typeof(Article))]
-public class SetAtheneumPsSettingsCmdlet : PSCmdlet
+public class SetAtheneumPsSettingsCmdlet : Base
 {
     /// <summary>
     /// <para type="description">The Path to the documentation parent directory.</para>
     /// </summary>
-    [Parameter(Mandatory = true)]
+    [Parameter(Mandatory = true, ParameterSetName = "New")]
     public DirectoryInfo DocumentationDirectory;
 
     /// <summary>
     /// <para type="description">The Path to the JSON File where the Contributors information is stored.</para>
     /// </summary>
-    [Parameter()]
+    [Parameter(ParameterSetName = "New")]
     [AllowNull()]
     public FileInfo? ContributorsJsonPath;
+
     /// <summary>
     /// <para type="description">The Path to the JSON File where the Contributors information is stored.</para>
     /// </summary>
-    [Parameter()]
+    [Parameter(ParameterSetName = "New")]
     [AllowNull()]
     public DirectoryInfo? MarkdownTemplateDirectory;
+
+    /// <summary>
+    /// <para type="description"></para>
+    /// </summary>
+    [Parameter(ParameterSetName = "New")]
+    [Parameter(ParameterSetName = "InputObject")]
+    [AllowNull()]
+    public string? Author;
+
+    /// <summary>
+    /// <para type="description"></para>
+    /// </summary>
+    [Parameter(Mandatory = true, ParameterSetName = "InputObject", ValueFromPipeline = true)]
+    public ScribeSettings InputObject;
 
     protected async override void EndProcessing()
     {
@@ -47,18 +62,27 @@ public class SetAtheneumPsSettingsCmdlet : PSCmdlet
         GetAtheneumPsSettingsCmdlet _getPsSettings = new();
 
         ScribeSettings _globalSettings;
-        try
-        {
-            _globalSettings = (ScribeSettings)_getPsSettings.Invoke();
-        }
-        catch
-        {
-            if (!settingsPath.Exists)
-            {
-                settingsPath.Create();
-            }
 
-            _globalSettings = new ScribeSettings(settingsJsonPath, DocumentationDirectory, ContributorsJsonPath);
+        if (this.ParameterSetName == "InputObject")
+        {
+            _globalSettings = InputObject;
+        }
+        else
+        {
+
+            try
+            {
+                _globalSettings = (ScribeSettings)_getPsSettings.Invoke();
+            }
+            catch
+            {
+                if (!settingsPath.Exists)
+                {
+                    settingsPath.Create();
+                }
+
+                _globalSettings = new ScribeSettings(settingsJsonPath, DocumentationDirectory, ContributorsJsonPath);
+            }
         }
 
         _globalSettings.DocumentationDirectory = DocumentationDirectory;
@@ -66,6 +90,8 @@ public class SetAtheneumPsSettingsCmdlet : PSCmdlet
         _globalSettings.ContributorsJsonPath = ContributorsJsonPath;
 
         _globalSettings.MarkdownTemplateDirectory = MarkdownTemplateDirectory;
+
+        _globalSettings.Author = Author;
 
         try
         {

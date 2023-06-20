@@ -99,6 +99,11 @@ public class ScribeSettings
         }
     }
 
+    /// <summary>
+    /// Record the default name that will be used during the creation of new documents.
+    /// </summary>
+    public String Author;
+
     public ScribeSettings()
     {
     }

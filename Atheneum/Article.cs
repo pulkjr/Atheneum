@@ -270,7 +270,7 @@ public class Article
         renderer.Render(Markdown);
         _articleString.AppendLine(stringWriter.ToString());
 
-        File.WriteAllText(Path.FullName, _articleString.ToString());
+        File.WriteAllText(Path.FullName, _articleString.ToString().Trim());
     }
     /// <summary>
     /// Set the Markdown property
